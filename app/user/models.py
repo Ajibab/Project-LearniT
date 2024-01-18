@@ -29,7 +29,7 @@ class PendingUser(AuditableModel):
     password = models.CharField(max_length=255, null=True)
 
     def is_valid(self) -> bool:
-        """30 mins OTP"""
+        # """30 mins OTP"""
         lifespan_in_seconds = float(30 * 60)
 
         now = datetime.now(timezone.utc)
