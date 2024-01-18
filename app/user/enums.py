@@ -1,0 +1,3 @@
+TOKEN_TYPE = (
+    ("PASSWORD_RESET", "PASSWORD_RESET"),
+)
