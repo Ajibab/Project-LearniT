@@ -42,9 +42,9 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('new_password_1','new_password_2','old_pasword')
 
-    def validate_password(self, attrs):
+    def validate_new_password_1(self, attrs):
         if attrs['new_password_1'] != attrs['new_password_2']:
-            raise serializers.ValidationError({"password":"enter correct password"})
+            raise serializers.ValidationError({"password":"mismatch password"})
         
         return attrs
     
@@ -59,6 +59,21 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         new_password_1 = self.validated_data["new_password"]
         user.set_password(new_password_1)
         user.save(update_fields=["password"])
+
+##-- Update User Serializer-- ##
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    """Serializer to validate Update User"""
+    class Meta:
+        model = get_user_model()
+        fields = ["id","email","first_name"]
+
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "email":{"read_only": True},
+            "first_name": {"read_only": True},
+        }
+
 
 ##-- Serializer to register User--##
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -92,7 +107,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                      "first_name": validated_data.get("first_name"),
                      "surname": validated_data.get("surname")
                      }
-        user: User = User.objects.create(user_data)
+        user: User = User.objects.create(**user_data)
         return user
 
 

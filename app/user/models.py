@@ -7,9 +7,10 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .enums import (
     TOKEN_TYPE,
 )
+from .managers import CustomUserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, AuditableModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=40, null=True, blank=True)
     surname = models.CharField(max_length=40, null=True, blank=True)
@@ -21,6 +22,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     interests = models.TextField(max_length=40, blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+
+    class Meta:
+        ordering = ("-created_time",)
+
+    def __str__(self) -> str:
+        return self.email
+    
+    def save_last_login(self) -> None:
+        self.last_login=datetime.now(timezone.utc)
+        self.save()
+
+    ##-- IDENTIFY NEW USERS--##
+    def is_new_user(self) -> bool:
+        """A new user: an account created within 20mins"""
+        accepted_time_in_seconds = float(20*60)
+        time_now = datetime.now(timezone.utc)
+        created_time = (time_now - self.created_at).total_seconds()
+        if created_time >= accepted_time_in_seconds:
+            return False
+        return True
+
+
+
 
 
 class PendingUser(AuditableModel):

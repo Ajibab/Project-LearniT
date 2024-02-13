@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from datetime import timedelta
+#from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ix_=%rr=d5q)5+q1khi0b#=w6k7ct3jzb$9r$%$*c(w)55@cq-'
+SECRET_KEY ="SECRET_KEY"
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG="DEBUG,cast=bool"
 
-ALLOWED_HOSTS = []
+USE_X_FORWARDED_HOST = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARD_PROTO", "https")
 
 
 # Application definition
@@ -38,7 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
+    'corsheaders',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +81,15 @@ TEMPLATES = [
     },
 ]
 
+STATIC_URL = "static/"
+STATIC_ROOT = "static/"
+
 WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ["https://*hereconomy.com"]
+LOGIN_URL = "rest_framework:login"
+LOGOUT_URL = "rest_framework:logout"
 
 
 # Database
@@ -84,6 +102,64 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    # DRF SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'core.pagination.CustomPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type":"apikey","name": "Authorization","in": "header"}
+    },
+}
+
+SPECTACULAR_SETTINGS = {
+    "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "DEFAULT_GENERATOR_CLASS": "drf_spectacular.generators.SchemaGenerator",
+    "SERVE_PERMISSION": ["rest_framework.permissions.AllowAny"],
+    "COMPONENT_SPLIT_REQUEST": True,
+    "COMPONENT_SPLIT_PATCH": True,
+    "SWAGGER_UI_SETTINGS": {
+        "deeplinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+        "displayRequestDuration": True,
+    },
+    "UPLOAD_FILES_USE_URL": True,
+    "TITLE": "Leaning Management System",
+    "DESCRIPTION": "A learning Platform with a Job Board",
+    "VERSION": "0.2.0",
+    "LICENCE": {"name": "BSD License"},
+    "CONTACT": {"name": "Ajibab", "email": "ajibolaolaosebikan@yahoo.com"},
+
+    "OAUTH2_FLOWS": [],
+    "OAUTH2_AUTHORIZATION_URL": None,
+    "OAUTH2_TOKEN_URL": None,
+    "OAUTH2_REFRESH_URL": None,
+    "OAUTH2_SCOPES": None,
+
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -114,6 +190,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
