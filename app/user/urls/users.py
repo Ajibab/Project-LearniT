@@ -8,6 +8,6 @@ app_name = "users"
 router = DefaultRouter()
 router.register("", RegisterUserViewsets)
 
-url_pattern = [
+urlpatterns = [
     path("", include(router.urls)),
 ]

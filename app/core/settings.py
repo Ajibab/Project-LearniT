@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 #from decouple import config
+#from config_file import ConfigFile
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,9 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
-    'drf_spectacular',
-    'drf_spectacular_sidecar',
-    'corsheaders',
+    'rest_framework_simplejwt',
+    'drf_spectacular'
 ]
 
 
@@ -105,12 +105,10 @@ DATABASES = {
 REST_FRAMEWORK = {
     # DRF SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_PAGINATION_CLASS': 'core.pagination.CustomPagination',
-    'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
 
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
@@ -202,3 +200,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#TWILIO_ACCOUNT_SID = ConfigFile('TWILIO_ACCOUNT_SID')
+#TWILIO_AUTH_TOKEN = ConfigFile('TWILIO_AUTH_TOKEN')
+#TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER')

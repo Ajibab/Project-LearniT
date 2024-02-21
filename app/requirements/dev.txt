@@ -11,3 +11,4 @@ djangorestframework-simplejwt==5.2.0
 drf-spectacular==0.22.1
 django-filter==22.1
 python-decouple==3.6
+twilio==8.1.0

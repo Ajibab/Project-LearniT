@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
 from datetime import datetime, timezone
@@ -10,7 +11,7 @@ from .enums import (
 from .managers import CustomUserManager
 
 
-class User(AbstractBaseUser, AuditableModel):
+class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=40, null=True, blank=True)
     surname = models.CharField(max_length=40, null=True, blank=True)
@@ -19,13 +20,14 @@ class User(AbstractBaseUser, AuditableModel):
     phone_number = models.CharField(max_length=25, blank=True, null=True)
     country = models.CharField(max_length=50, blank=True, null=True)
     password = models.CharField(max_length=255, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     interests = models.TextField(max_length=40, blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
 
     class Meta:
-        ordering = ("-created_time",)
+        ordering = ("-created_at",)
 
     def __str__(self) -> str:
         return self.email
@@ -53,9 +55,12 @@ class PendingUser(AuditableModel):
     verification_code = models.CharField(max_length=255, blank=True, null=True)
     password = models.CharField(max_length=255, null=True)
 
+    def __str__(self):
+        return f"{str(self.email)} {self.verification_code}"
+
     def is_valid(self) -> bool:
-        # """30 mins OTP"""
-        lifespan_in_seconds = float(30 * 60)
+        # """10 mins OTP validation"""
+        lifespan_in_seconds = float(10 * 60)
 
         now = datetime.now(timezone.utc)
         time_diff = now - self.created_at
@@ -74,7 +79,7 @@ class UserProfile(models.Model):
 class Token(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=255, null=True)
+    token = models.CharField(max_length=8, null=True)
     token_type = models.CharField(max_length=100, choices=TOKEN_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
 
