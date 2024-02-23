@@ -2,13 +2,3 @@
 pytest-django==4.5.2
 factory-boy==3.2.0
 pytest-factoryboy==2.5.0
-django-cors-headers==3.13.0
-python-decouple==3.6
-celery==5.2.7
-flower==1.1.0
-djangorestframework==3.13.1
-djangorestframework-simplejwt==5.2.0
-drf-spectacular==0.22.1
-django-filter==22.1
-python-decouple==3.6
-twilio==8.1.0
