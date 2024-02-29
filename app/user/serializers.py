@@ -55,14 +55,14 @@ class AuthTokenSerializer(serializers.Serializer):
         return attrs
 
 
-class ChangePasswordSerializer(serializers.ModelSerializer):
+class ChangePasswordSerializer(serializers.Serializer):
     new_password_1 = serializers.CharField(max_length=120,write_only=True,required=True,min_length=6)
     new_password_2 = serializers.CharField(max_length=120,write_only=True,required=True,min_length=6)
     old_password = serializers.CharField(max_length=120, write_only=True,required=True,min_length=6)
 
     class Meta:
         model = User
-        fields = ('new_password_1','new_password_2','old_pasword')
+        fields = ('new_password_1','new_password_2','old_password')
 
     def validate_new_password_1(self, attrs):
         if attrs['new_password_1'] != attrs['new_password_2']:
@@ -82,7 +82,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         user.set_password(new_password_1)
         user.save(update_fields=["password"])
 
-##-- This serializer create a password from the reset OTP serializer--##
+##-- This serializer creates a password from the reset OTP serializer--##
 class CreatePasswordFromChangedOTPSerializer(serializers.Serializer):
     otp = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
@@ -90,6 +90,7 @@ class CreatePasswordFromChangedOTPSerializer(serializers.Serializer):
 class AccountVerificationSerializer(serializers.Serializer):
     otp = serializers.CharField(required=True)
     email = serializers.EmailField(required=True,allow_blank=False)
+    #password = serializers.CharField(required=True, allow_blank=False)
 
     def validate(self, attrs: dict):
         email_add: str=attrs.get('email').strip().lower()
@@ -196,7 +197,7 @@ class BasicUserInfoSerializer(serializers.ModelSerializer):
 ##-- Serializer to register User--##
 class RegisterUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
-    new_password_1 =serializers.CharField(write_only=True, required=True) #validators=validate_password)
+    new_password_1 =serializers.CharField(write_only=True, required=True)
     new_password_2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
@@ -218,20 +219,30 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"email": "Email already exist"})
         attrs['email'] = cleaned_email
 
-
         if attrs['new_password_1'] !=attrs['new_password_2']:
             raise serializers.ValidationError({"password": "Incorrect password"})
         return super().validate(attrs)
     
     def create(self, validated_data: dict):
-        user_data = {"email": validated_data.get("email"),
-                     "password": make_password(validated_data.get("new_password_1")),
-                     "first_name": validated_data.get("first_name"),
-                     "surname": validated_data.get("surname")
-                     }
-        user: User = User.objects.create(**user_data)
+        """This method first creates the pending user, and then register the user after verification"""
+        otp = generate_otp()
+        email = validated_data.get('email')
+        user, _ = PendingUser.objects.update_or_create(
+            email=email,
+            defaults={
+                "email": email,
+                "verification_code": otp,
+                "password": make_password(validated_data.get('password')),
+                "created_at": datetime.now(timezone.utc)
+            }
+        )
+        message_info={
+            'message': f"Account Verification!\nYour OTP for is {otp}.\nIt is valid for 10 minutes",
+            'email': user.email
+            
+        }
+        
         return user
-
 
 
 

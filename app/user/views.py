@@ -52,11 +52,11 @@ class AuthenticationViewSet(viewsets.GenericViewSet):
         serializer.save()
         return Response({
             "success":True,
-            "message": "Temporay password sent to your mobile!"
+            "message": "Temporay password sent to your email!"
         })
     @action(methods=['POST'], detail=False, serializer_class=CreatePasswordFromChangedOTPSerializer)
     def create_password(self, request, pk=None):
-        """This method enables users to create a new password having received the OTP sent to user phone number"""
+        """This method enables users to create a new password having received the OTP sent to the User's Email"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token: Token = Token.objects.filter(
@@ -176,7 +176,7 @@ class RegisterUserViewsets(viewsets.ModelViewSet):
             permission_class = [IsAuthenticated]
         elif self.action in ["destroy"]:
             permission_class = [IsAuthenticated]
-        return [permission_class() for permission in permission_class]
+        return [permission for permission in permission_class]
     
     @extend_schema(
             responses={

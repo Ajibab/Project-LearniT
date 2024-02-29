@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'rest_framework_simplejwt',
-    'drf_spectacular'
+    'drf_spectacular',
+    'djcelery_email',
+    'django_celery_results',
+    
 ]
 
 
@@ -180,7 +183,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
+EMAIL_USE_TLS = True
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'olaosebikanwaliu@gmail.com'
+EMAIL_HOST_PASSWORD='AllahuAkbar12345*'
+EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
+CELERY_BROKER_URL = ''
+CELERY_RESULT_BACKEND= 'django-cache'
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -201,6 +212,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#TWILIO_ACCOUNT_SID = ConfigFile('TWILIO_ACCOUNT_SID')
-#TWILIO_AUTH_TOKEN = ConfigFile('TWILIO_AUTH_TOKEN')
-#TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER')
+## CELERY PARAMETERS
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND ='redis://localhost:6379'
+CELERY_ACCEPT_CONTENT =['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER= 'json'
