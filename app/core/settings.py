@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-#from decouple import config
-#from config_file import ConfigFile
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,9 +46,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework_simplejwt',
     'drf_spectacular',
-    'djcelery_email',
-    'django_celery_results',
-    
+    'core.celery.CeleryConfig',
 ]
 
 
@@ -183,16 +180,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
-EMAIL_USE_TLS = True
 
+# EMAIL SETTINGS 
+EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'olaosebikanwaliu@gmail.com'
-EMAIL_HOST_PASSWORD='AllahuAkbar12345*'
-EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
-CELERY_BROKER_URL = ''
-CELERY_RESULT_BACKEND= 'django-cache'
-LANGUAGE_CODE = 'en-us'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# console used temporarily so that emails are printed to the screen.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 TIME_ZONE = 'UTC'
 
@@ -212,9 +211,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-## CELERY PARAMETERS
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND ='redis://localhost:6379'
+
+CELERY_BROKER_URL = "amqps://wldzngjp:6UpIo4qyc-1VxK_t7sH0Voy-prubEwqc@hawk.rmq.cloudamqp.com/wldzngjp" 
+# CELERY_RESULT_BACKEND ='redis://localhost:6379'
 CELERY_ACCEPT_CONTENT =['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER= 'json'

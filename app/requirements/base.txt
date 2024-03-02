@@ -10,3 +10,5 @@ django-filter==22.1
 python-decouple==3.6
 twilio==8.1.0
 redis==2.2
+pyotp==2.9.0
+flower==1.1.0

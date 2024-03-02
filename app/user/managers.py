@@ -11,8 +11,7 @@ class CustomUserManager(BaseUserManager):
         """ Create and save a User with the assigned username and password"""
         if not email:
             raise ValueError(_('Set email address'))
-        user=self.model(email=email, is_active=True,
-                        verified=True, roles=[SytemRoleEnum.CUSTOMER,],**extra_fields)
+        user=self.model(email=email, is_active=True,**extra_fields)
         user.save()
         return user
 

@@ -22,6 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=255, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     interests = models.TextField(max_length=40, blank=True, null=True)
+    is_active = models.BooleanField(default=False)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
@@ -65,6 +66,8 @@ class PendingUser(AuditableModel):
         now = datetime.now(timezone.utc)
         time_diff = now - self.created_at
         time_diff = time_diff.total_seconds()
+        print("lif", lifespan_in_seconds)
+        print("dif", time_diff)
         if time_diff >= lifespan_in_seconds:
             return False
         return True
