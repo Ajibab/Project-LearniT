@@ -9,7 +9,7 @@ class TestUser:
     list_of_user_urls = reverse("user:user-list")
 
     def test_create_user(self,api_client,mocker):
-        """This is the first test to a valid user"""
+        """This is the first test to a ascertain a valid user"""
         mock_send_otp = mocker.patch('user.tasks.send_account_verification_email.delay')
 
         data = {

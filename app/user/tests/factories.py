@@ -13,8 +13,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: 'name{}@example.com'.format(n))
     first_name = fake.name()
     surname = fake.name()
-    #password = factory.PostGenerationMethod('set_password','passes@@@1233')
-    #verified ='True'
+    password = factory.PostGenerationMethod('set_password','passes@@@1233')
+    verified ='True'
     @classmethod
     def _prepare(cls,create,**kwargs):
         password = kwargs.pop("password", None)
