@@ -1,9 +1,9 @@
 import pytest
 from django.urls import reverse
-from ..models import User
+from user.models import User
 from pytest_factoryboy import register
 from rest_framework.test import APIClient 
-from .factories import UserFactory,TokenFactory
+from user.tests.factories import UserFactory,TokenFactory
 
 "This conftest is a centralized point for all fixtures"
 register(UserFactory)
@@ -11,6 +11,7 @@ register(TokenFactory)
 
 @pytest.fixture
 def api_client():
+    
     return APIClient()
 
 @pytest.fixture
@@ -19,7 +20,7 @@ def active_user(db, user_factory):
 
 @pytest.fixture
 def auth_user_password() -> str:
-    return password
+    return 'password'
 
 @pytest.fixture
 def inactive_user(db, user_factory):

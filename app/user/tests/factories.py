@@ -1,7 +1,7 @@
 import factory
 from django.contrib.auth.models import User
 from faker import Faker 
-from .models import User, Token
+from ..models import User, Token
 
 """Factory is created for the User and Token Models to generate testing data"""
 
@@ -13,7 +13,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: 'name{}@example.com'.format(n))
     first_name = fake.name()
     surname = fake.name()
-    password = factory.PostGenerationMethod('set_password','passes@@@1233')
+    password = factory.PostGenerationMethodCall('set_password','passes@@@1233')
     verified ='True'
     @classmethod
     def _prepare(cls,create,**kwargs):
