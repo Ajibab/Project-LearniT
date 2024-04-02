@@ -33,8 +33,8 @@ class TestUser:
             }
         #mock_send_otp.assert_called_once_with(message_info)   
 
-    def test_unable_to_create_user_with_invalid_email(self, api_client,mocker):
-        """This test is to ensure a user with invalid information cannot register"""
+    def test_unable_to_create_user_with_invalid_email(self, api_client):
+        """This test is to ensure a user with invalid email address cannot register"""
         data = {
             "email": "ajibolaolaosebikan.com",
             "first_name": "Ajibola",
@@ -44,4 +44,5 @@ class TestUser:
         }
         response = api_client.post(self.list_of_user_urls,data)
         assert response.status_code== 400
-        
+
+    
