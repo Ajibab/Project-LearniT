@@ -20,7 +20,7 @@ def active_user(db, user_factory):
 
 @pytest.fixture
 def auth_user_password() -> str:
-    return 'password'
+    return 'Ajibola1234@'
 
 @pytest.fixture
 def inactive_user(db, user_factory):
@@ -29,15 +29,15 @@ def inactive_user(db, user_factory):
 
 @pytest.fixture
 def authenticate_user(api_client,active_user:User,auth_user_password):
-    def _user(verified=True, is_active=True,is_admin=False):
-        active_user.verified = verified
+    def _user(is_active=True,is_admin=False):
+        #active_user.verified = verified
         active_user.is_active = is_active
         active_user.is_admin = is_admin
         active_user.save()
         active_user.refresh_from_db()
         url = reverse("auth:login")
         data = {
-            "phone": active_user.email,
+            "email": active_user.email,
             "password": auth_user_password,
         }
         response = api_client.post(url,data)

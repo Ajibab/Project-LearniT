@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 
 from .conftest import api_client_with_credentials
-from ..models import PendingUser 
+from ..models import User, PendingUser 
 pytestmark = pytest.mark.django_db
 
 class TestUser:
@@ -43,6 +43,18 @@ class TestUser:
             "new_password_2":"password@1"
         }
         response = api_client.post(self.list_of_user_urls,data)
+       
         assert response.status_code== 400
 
-    
+    def test_unable_to_create_user_with_unmatched_passowrd(self, api_client):
+        """This test is to ensure a user with unmacthed password cannot register"""
+        data = {
+            "email": "ajibolaolaosebikan@yahoo.com",
+            "first_name": "Ajibola",
+            "surname": "Olaosebikan",
+            "new_password_1":"password@1",
+            "new_password_2":"password@2"
+        }
+        response = api_client.post(self.list_of_user_urls,data)
+       
+        assert response.status_code== 400
