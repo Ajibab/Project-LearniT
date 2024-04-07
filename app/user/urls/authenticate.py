@@ -5,7 +5,7 @@ from ..views import (
     CustomObtainTokenPairViewSets,
     ChangePasswordViewSets,AuthenticationViewSet
 )
-application_name = "authenticate"
+app_name = "authenticate"
 router = DefaultRouter()
 router.register("",AuthenticationViewSet,basename="authenticate")
 router.register("change-password",ChangePasswordViewSets,basename="password-change")

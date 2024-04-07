@@ -8,10 +8,10 @@ pytestmark = pytest.mark.django_db
 
 class TestAuthenticationEndpoints:
     """"Testing the APIs"""
-    login_url = reverse("login")
+    login_url = reverse("authenticate:login")
     """With reverse(authenticate:login), an error was thrown(err:'authenticate' is not a registered namespace). 
     However, with reverse(login) the test was successful"""
-    password_change_url = reverse("change-password")
+    password_change_url = reverse("authenticate:password-change-list")
  
     def test_user_login(self, api_client, active_user, auth_user_password):
         data = {"email": active_user.email, "password":auth_user_password}
@@ -39,9 +39,11 @@ class TestAuthenticationEndpoints:
         token = user["token"]
         user_instance = user["user_instance"]
         data = {"old_password":auth_user_password,
-                "new_password": "ajibolaaa@@"}
+                "new_password_1": "ajibolaaa@@",
+                "new_password_2": "ajibolaaa@@"}
         api_client_with_credentials(token, api_client)
         response = api_client.post(self.password_change_url,data,format="json")
+        print(response.json())
         assert response.status_code == status.HTTP_200_OK
         user_instance.refresh_from_db()
         assert user_instance.check_password("ajibolaaa@@")

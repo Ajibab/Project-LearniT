@@ -35,7 +35,7 @@ def authenticate_user(api_client,active_user:User,auth_user_password):
         active_user.is_admin = is_admin
         active_user.save()
         active_user.refresh_from_db()
-        url = reverse("auth:login")
+        url = reverse("authenticate:login")
         data = {
             "email": active_user.email,
             "password": auth_user_password,

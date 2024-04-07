@@ -1,6 +1,6 @@
 import pytest
 from django.urls import reverse
-from mock import patch
+#from mock import patch
 from unittest.mock import Mock
 
 
