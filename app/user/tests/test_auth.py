@@ -40,7 +40,7 @@ class TestAuthenticationEndpoints:
         user_instance = user["user_instance"]
         data = {"old_password":auth_user_password,
                 "new_password_1": "ajibolaaa@@",
-                "new_password_2": "ajibolaaa@@"}
+                }
         api_client_with_credentials(token, api_client)
         response = api_client.post(self.password_change_url,data,format="json")
         print(response.json())
