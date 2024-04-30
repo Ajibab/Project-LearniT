@@ -4,7 +4,7 @@ celery -A core worker --loglevel=info
 
 celery -A core beat -l info
 
-celery --broker=${RABBITMQ_URL} flower --port=5555
+celery --broker=amqps://wldzngjp:6UpIo4qyc-1VxK_t7sH0Voy-prubEwqc@hawk.rmq.cloudamqp.com/wldzngjp flower --port=5555
 
 redis-server
 

@@ -127,7 +127,7 @@ class ChangePasswordViewSets(viewsets.GenericViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        serializer.save()
         return Response(
             {"message": "Your password has been updated"}, status.HTTP_200_OK
         )
