@@ -1,4 +1,5 @@
 from django.db import models
+import calendar
 import uuid
 from django.utils.text import slugify
 from django.db.models.signals import pre_save
@@ -8,9 +9,14 @@ from django.utils.crypto import get_random_string
 from datetime import datetime, timezone
 from core.models import AuditableModel
 
+"""Define the choice field for course duration in months
+using the calender module"""
+MONTH_DURATION_CHOICES = [(str(i), calendar.month_name[i]) for i in range(1,13)] 
+
+##--- Define Tables ---##
 class Categories(models.Model):
     """ This entity would section the courses into their various categories"""
-    icon = models.CharField(max_length=200)
+    icon = models.ImageField(upload_to='Media/author')
     name = models.CharField(max_length=200)
 
     def __str__(self) -> str:
@@ -20,14 +26,6 @@ class Categories(models.Model):
         return Categories.objects.all().order_by('id')
     
 
-class Instrcutor(models.Model):
-    """This table bears the information of the instructor"""
-    instructor_profile = models.ImageField(upload_to='Media/author')
-    name = models.CharField(max_length=200, null=True)
-    instructor_bio = models.TextField()
-
-    def __str__(self) -> str:
-        return self.name
     
 class Language(models.Model):
     """A table for the choice of language"""
@@ -36,29 +34,28 @@ class Language(models.Model):
     def __str__(self) -> str:
         return self.language
     
+class CourseCategory(models.Model):
+    """This is an intermediary model that links the Course and Categories models.
+    This was done to address the error thrown up due to the use of the many-to-many field"""
+    course = models.ForeignKey("Course",on_delete=models.CASCADE)
+    categories = models.ForeignKey(Categories,on_delete=models.CASCADE)
 
 class Course(models.Model):
     """The course entity has module and lessons under it"""
     course_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     title = models.CharField(max_length=500)
     description = models.TextField()
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField(auto_now_add=True)
-    category = models.ForeignKey(Categories, on_delete=models.CASCADE)
+    preview = models.BooleanField(default=False)
+    timeline_number = models.IntegerField()
+    timeline_duration_type = models.CharField(max_length=500, choices=MONTH_DURATION_CHOICES, default='1')
+    category = models.ManyToManyField(Categories,related_name="course",through=CourseCategory,through_fields=('course','categories'))
     language = models.ForeignKey(Language, on_delete=models.CASCADE,null=True)
-    image_content = models.ImageField(upload_to="Media/featured_img",null=True)
-    video_content = models.CharField(max_length=300,null=True)
-    instructor_profile = models.ForeignKey(Instrcutor,on_delete=models.CASCADE,null=True)
-    deadline = models.CharField(max_length=100, null=True)
-    slug = models.SlugField(default='', max_length=500, null=True, blank=True)
-    certificate = models.CharField(max_length=100,null=True)
-
+    instructor_profile = models.ForeignKey('user.User',on_delete=models.CASCADE,null=True)
+    slug = models.SlugField(unique=True, max_length=500)  
+    certificate = models.CharField(max_length=100,null=True)  
+    
     def __str__(self) -> str:
         return self.title
-    
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse("course_details", kwargs={'slug':self.slug})
     
 def create_slug(instance, new_slug=None):
     slug = slugify(instance.title)
@@ -80,28 +77,44 @@ pre_save.connect(pre_save_post_receiver, Course)
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     module_name = models.CharField(max_length=200)
-    start_time = models.DateTimeField(auto_now_add=True)
     
     def __str__(self) -> str:
         return self.module_name
     
+class ModuleTasksSubmission(AuditableModel):
+    module = models.ForeignKey(Module,on_delete=models.CASCADE,related_name='submitted_module_assignment')
+    user = models.ForeignKey('user.User',on_delete=models.CASCADE,related_name='module_assignment_for_user')
+    assignment_upload = models.FileField(upload_to='upload_file/',blank=True,null=True)
+
+    def __str__(self) -> str:
+        return f'{self.user} {self.module}'
+    
 class Lessons(models.Model):
     lesson_name = models.CharField(max_length=200)
     module_name = models.ForeignKey(Module, on_delete=models.CASCADE)
+    content = models.TextField(max_length=300,null=True)  ## Rich text editor
     
     def __str__(self) -> str:
         return self.lesson_name
     
-class Video(models.Model):
-    video_id = models.IntegerField(null=True)
-    thumbnail = models.ImageField(upload_to="Media/Yt_Thumbnail",null=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lesson_name = models.ForeignKey(Lessons,on_delete=models.CASCADE)
-    title=models.CharField(max_length=200)
-    time_duration = models.IntegerField(null=True)
-    preview = models.BooleanField(default=False)
+class UserCourseActivityTracker(models.Model):
+    user_name = models.ForeignKey('user.User',on_delete=models.CASCADE)
+    start_date = models.DateTimeField(auto_now=True)
+    end_date = models.DateTimeField(auto_now=True)  
+    course = models.ForeignKey(Course,on_delete=models.CASCADE)  
 
+    def __str__(self) -> str:
+        return self.user_name
     
+class UserCertificate(models.Model):
+    user_name = models.ForeignKey('user.User', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    certificate = models.CharField(max_length = 100, null=True)
+
+    def __str__(self) -> str:
+        return self.certificate
+
+
     
 
 

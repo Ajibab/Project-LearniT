@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
+    'lms',
+    'tasks',
     'rest_framework_simplejwt',
     'drf_spectacular',
     'core.celery.CeleryConfig',

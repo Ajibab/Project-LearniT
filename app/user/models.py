@@ -4,12 +4,12 @@ from django.db import models
 from django.utils.crypto import get_random_string
 from datetime import datetime, timezone
 from core.models import AuditableModel
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .enums import (
-    TOKEN_TYPE,
+    TOKEN_TYPE, 
 )
 from .managers import CustomUserManager
-
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -23,6 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     interests = models.TextField(max_length=40, blank=True, null=True)
     is_active = models.BooleanField(default=False)
+    roles = models.CharField(max_length=20,blank=True, null=True, default='Student')
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
@@ -46,9 +47,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         if created_time >= accepted_time_in_seconds:
             return False
         return True
-
-
-
 
 
 class PendingUser(AuditableModel):

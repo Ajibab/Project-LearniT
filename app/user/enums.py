@@ -17,3 +17,10 @@ class TokenEnum:
 class SytemRoleEnum:
     ADMIN = "ADMIN"
     CUSTOMER = "CUSTOMER"
+
+GENDER_OPTION = (("MALE", "MALE"), ("FEMALE","FEMALE"))
+
+#USER_ROLE = (
+    #("LEARNER", "LEARNER"),
+    #("INSTRUCTOR", "INSTRUCTOR")
+#)
