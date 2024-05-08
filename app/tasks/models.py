@@ -35,3 +35,5 @@ class MultipleChoiceTasks(models.Model):
     option_3 = models.CharField(max_length=200,null=True)
     option_4 = models.CharField(max_length=200)
 
+
+# Am not sure these models is complete
