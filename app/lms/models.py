@@ -16,8 +16,8 @@ MONTH_DURATION_CHOICES = [(str(i), calendar.month_name[i]) for i in range(1,13)]
 ##--- Define Tables ---##
 class Categories(models.Model):
     """ This entity would section the courses into their various categories"""
-    icon = models.ImageField(upload_to='Media/author')
-    name = models.CharField(max_length=200)
+    icon = models.ImageField(upload_to='Media/author',null=True,blank=True)
+    name = models.CharField(max_length=200,null=True,blank=True)
 
     def __str__(self) -> str:
         return self.name
@@ -42,7 +42,7 @@ class CourseCategory(models.Model):
 
 class Course(models.Model):
     """The course entity has module and lessons under it"""
-    course_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     title = models.CharField(max_length=500)
     description = models.TextField()
     preview = models.BooleanField(default=False)
@@ -52,7 +52,7 @@ class Course(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE,null=True)
     instructor_profile = models.ForeignKey('user.User',on_delete=models.CASCADE,null=True)
     slug = models.SlugField(unique=True, max_length=500)  
-    certificate = models.CharField(max_length=100,null=True)  
+    certificate = models.FileField(max_length=100,null=True)  
     
     def __str__(self) -> str:
         return self.title
@@ -76,7 +76,7 @@ pre_save.connect(pre_save_post_receiver, Course)
 
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    module_name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     
     def __str__(self) -> str:
         return self.module_name
@@ -89,16 +89,16 @@ class ModuleTasksSubmission(AuditableModel):
     def __str__(self) -> str:
         return f'{self.user} {self.module}'
     
-class Lessons(models.Model):
-    lesson_name = models.CharField(max_length=200)
-    module_name = models.ForeignKey(Module, on_delete=models.CASCADE)
+class Lesson(models.Model):
+    name = models.CharField(max_length=200)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
     content = models.TextField(max_length=300,null=True)  ## Rich text editor
     
     def __str__(self) -> str:
         return self.lesson_name
     
 class UserCourseActivityTracker(models.Model):
-    user_name = models.ForeignKey('user.User',on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User',on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now=True)
     end_date = models.DateTimeField(auto_now=True)  
     course = models.ForeignKey(Course,on_delete=models.CASCADE)  
@@ -107,9 +107,9 @@ class UserCourseActivityTracker(models.Model):
         return self.user_name
     
 class UserCertificate(models.Model):
-    user_name = models.ForeignKey('user.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    certificate = models.CharField(max_length = 100, null=True)
+    certificate = models.FileField(max_length = 100, null=True)
 
     def __str__(self) -> str:
         return self.certificate
