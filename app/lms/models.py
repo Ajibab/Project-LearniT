@@ -57,7 +57,7 @@ class Course(models.Model):
     
     #timeline_duration_type
     #the choice for this field is day, week, month, and year. Not names of months as 
-    #returned by calendar module. Declare this as choice field
+    #returned by calendar module. Declare this as choice field as shown below
     """
     from django.db import models
 
