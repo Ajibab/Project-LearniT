@@ -39,6 +39,7 @@ class CourseCategory(models.Model):
     This was done to address the error thrown up due to the use of the many-to-many field"""
     course = models.ForeignKey("Course",on_delete=models.CASCADE)
     categories = models.ForeignKey(Categories,on_delete=models.CASCADE)
+    # Please remove this intermediary model
 
 class Course(models.Model):
     """The course entity has module and lessons under it"""
@@ -53,6 +54,19 @@ class Course(models.Model):
     instructor_profile = models.ForeignKey('user.User',on_delete=models.CASCADE,null=True)
     slug = models.SlugField(unique=True, max_length=500)  
     certificate = models.FileField(max_length=100,null=True)  
+    
+    #timeline_duration_type
+    #the choice for this field is day, week, month, and year. Not names of months as 
+    #returned by calendar module. Declare this as choice field
+    """
+    from django.db import models
+
+        class DurationTypChoice(models.TextChoices):
+            day = ("day", "day")
+
+    then use in field(choice=DurationTypChoice, default=DurationTypChoice.day)
+    
+    """
     
     def __str__(self) -> str:
         return self.title
@@ -79,7 +93,7 @@ class Module(models.Model):
     name = models.CharField(max_length=200)
     
     def __str__(self) -> str:
-        return self.module_name
+        return self.name
     
 class ModuleTasksSubmission(AuditableModel):
     module = models.ForeignKey(Module,on_delete=models.CASCADE,related_name='submitted_module_assignment')
@@ -95,7 +109,7 @@ class Lesson(models.Model):
     content = models.TextField(max_length=300,null=True)  ## Rich text editor
     
     def __str__(self) -> str:
-        return self.lesson_name
+        return self.name
     
 class UserCourseActivityTracker(models.Model):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE)
@@ -104,7 +118,7 @@ class UserCourseActivityTracker(models.Model):
     course = models.ForeignKey(Course,on_delete=models.CASCADE)  
 
     def __str__(self) -> str:
-        return self.user_name
+        return self.user
     
 class UserCertificate(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
