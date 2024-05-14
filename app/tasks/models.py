@@ -106,7 +106,7 @@ class UserAttemptActivity(AuditableModel):
         return f"{self.user}, you scored {self.score} in {self.quiz.task}"
     
 class TheoryQuiz(AuditableModel):
-    module = models.OneToOneField("course.Module",related_name="module_quiz",on_delete=models.CASCADE,blank=True,null=True)
+    module = models.OneToOneField("lms.Course",related_name="module_quiz",on_delete=models.CASCADE,blank=True,null=True)
     quiz_name = models.CharField(max_length=255)
     created_by = models.ForeignKey("user.User",related_name="created_quiz",on_delete=models.CASCADE)
     question = models.TextField()
