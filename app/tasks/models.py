@@ -18,9 +18,7 @@ class Quiz(AuditableModel):
     module = models.OneToOneField("lms.Module",related_name="module_task",on_delete=models.CASCADE,blank=True,null=True)
     task = models.CharField(max_length=255)
     creator = models.ForeignKey("user.User",related_name='created_tasks',on_delete=models.CASCADE)
-    user = models.ForeignKey('user.User',on_delete=models.CASCADE,related_name='user_quiz',blank=True,null=True)
     reattempt = models.BooleanField(default=True,verbose_name='Reattempt Question')
-    #tags=TaggableManager(through=UUIDTaggedItem)
     slug = models.SlugField(null=True, blank=True)
 
 
@@ -117,7 +115,7 @@ class TheoryQuizAttempt(AuditableModel):
     score = models.FloatField()
     date_taken = models.DateTimeField(auto_now_add=True)
     percentage_score = models.FloatField(default=0.00)
-    submitted_ansert = models.FileField()
+    submitted_answer = models.FileField()
     
 
 

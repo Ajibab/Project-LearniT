@@ -9,9 +9,13 @@ from django.utils.crypto import get_random_string
 from datetime import datetime, timezone
 from core.models import AuditableModel
 
-"""Define the choice field for course duration in months
-using the calender module"""
-MONTH_DURATION_CHOICES = [(str(i), calendar.month_name[i]) for i in range(1,13)] 
+"""Define the choice field for course duration in days"""
+DurationTypeChoice = (
+    ('week','week'),
+    ('day','day'),
+    ('month','month'),
+    ('year','year')
+)
 
 ##--- Define Tables ---##
 class Categories(models.Model):
@@ -33,13 +37,6 @@ class Language(models.Model):
 
     def __str__(self) -> str:
         return self.language
-    
-class CourseCategory(models.Model):
-    """This is an intermediary model that links the Course and Categories models.
-    This was done to address the error thrown up due to the use of the many-to-many field"""
-    course = models.ForeignKey("Course",on_delete=models.CASCADE)
-    categories = models.ForeignKey(Categories,on_delete=models.CASCADE)
-    # Please remove this intermediary model
 
 class Course(models.Model):
     """The course entity has module and lessons under it"""
@@ -48,25 +45,12 @@ class Course(models.Model):
     description = models.TextField()
     preview = models.BooleanField(default=False)
     timeline_number = models.IntegerField()
-    timeline_duration_type = models.CharField(max_length=500, choices=MONTH_DURATION_CHOICES, default='1')
-    category = models.ManyToManyField(Categories,related_name="course",through=CourseCategory,through_fields=('course','categories'))
+    timeline_duration_type = models.CharField(choices=DurationTypeChoice,default='week',max_length=200)
+    category = models.ManyToManyField(Categories,related_name="course")#,through_fields=('course','categories'))
     language = models.ForeignKey(Language, on_delete=models.CASCADE,null=True)
     instructor_profile = models.ForeignKey('user.User',on_delete=models.CASCADE,null=True)
     slug = models.SlugField(unique=True, max_length=500)  
     certificate = models.FileField(max_length=100,null=True)  
-    
-    #timeline_duration_type
-    #the choice for this field is day, week, month, and year. Not names of months as 
-    #returned by calendar module. Declare this as choice field as shown below
-    """
-    from django.db import models
-
-        class DurationTypChoice(models.TextChoices):
-            day = ("day", "day")
-
-    then use in field(choice=DurationTypChoice, default=DurationTypChoice.day)
-    
-    """
     
     def __str__(self) -> str:
         return self.title
