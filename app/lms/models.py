@@ -1,5 +1,4 @@
 from django.db import models
-import calendar
 import uuid
 from django.utils.text import slugify
 from django.db.models.signals import pre_save
