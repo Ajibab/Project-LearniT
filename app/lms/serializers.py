@@ -19,8 +19,7 @@ class ListCoursesSerializer(ModelSerializer):
             'description': {'write_only': True}
         }
         
-        """Define a method that retrieves the course
-        title and its description"""
-        def get_courses_list(self, obj):
-            return f"Course: {obj.title} details: {obj.description}"
+class GetACourseByIdSerializer(ModelSerializer):
+    """ Given an ID, get a specific course"""
+
         

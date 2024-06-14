@@ -6,10 +6,10 @@ from ..views import ListCoursesViewsets
 app_name = "lms"
 
 router = DefaultRouter()
-router.register("", ListCoursesViewsets,basename="listofcourses")
+router.register("courses", ListCoursesViewsets,basename="listofcourses")
 
 
 urlpatterns = [
-    path("listallcourses/",ListCoursesViewsets.as_view({'get': 'list'}), name="list-all-courses"),
     path("", include(router.urls)),
+    #path("listallcourses/",ListCoursesViewsets, name="list-all-courses"),
 ]

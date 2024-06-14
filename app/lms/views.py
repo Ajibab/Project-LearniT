@@ -15,7 +15,7 @@ from .serializers import ListCoursesSerializer
 
 
 class ListCoursesViewsets(viewsets.ModelViewSet):
-    queryset = get_user_model().objects.all()
+    queryset = Course.objects.all()
     serializer_class = ListCoursesSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -40,10 +40,12 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
 
     def get_permissions(self):
         permission_class = self.permission_classes
-        if self.action in ["list", "retrieve", "partial_update", "update"]:
-            permission_class = [IsAuthenticated]
+        if self.action in ["list", "retrieve"]:
+            permission_class = [AllowAny]
         elif self.action in ["destroy"]:
             permission_class = [IsAuthenticated]
+        ##create custom permission(how verify a user admin etc.)
+        ##override get serializer class
         return [permission() for permission in permission_class]
 
 

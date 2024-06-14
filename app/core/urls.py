@@ -29,5 +29,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/authenticate/', include('user.urls.authenticate')),
     path('api/v1/users/', include('user.urls.users')),
-    path('api/v1/lms', include('lms.urls.lmsurl'))
+    path('api/v1/lms/', include('lms.urls.lms'))
 ]
