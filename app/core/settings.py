@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'user',
     'lms',
     'tasks',
-    'taggit',
     'rest_framework_simplejwt',
     'drf_spectacular',
     'core.celery.CeleryConfig',
