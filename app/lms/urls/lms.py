@@ -11,5 +11,4 @@ router.register("courses", ListCoursesViewsets,basename="listofcourses")
 
 urlpatterns = [
     path("", include(router.urls)),
-    #path("listallcourses/",ListCoursesViewsets, name="list-all-courses"),
 ]

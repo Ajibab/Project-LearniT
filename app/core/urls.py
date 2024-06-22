@@ -31,3 +31,5 @@ urlpatterns = [
     path('api/v1/users/', include('user.urls.users')),
     path('api/v1/lms/', include('lms.urls.lms'))
 ]
+
+#users/

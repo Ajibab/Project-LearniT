@@ -49,7 +49,23 @@ class Course(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE,null=True)
     instructor_profile = models.ForeignKey('user.User',on_delete=models.CASCADE,null=True)
     slug = models.SlugField(unique=True, max_length=500)  
-    certificate = models.FileField(max_length=100,null=True)  
+    certificate = models.FileField(max_length=100,null=True) 
+
+    @property
+    def user_activity_count(self):
+        """counts active user on the platform"""
+        return self.user_activity.counts()
+    
+    @property
+    def total_modules(self):
+        """counts the total modules"""
+        return self.modules.count()
+    
+    @property
+    def total_instructors(self):
+        """counts the total instructors"""
+        return self.instructor_profile.count()
+    
     
     def __str__(self) -> str:
         return self.title

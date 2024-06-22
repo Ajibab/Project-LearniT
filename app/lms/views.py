@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Course, Categories
 from .serializers import ListCoursesSerializer
+from user.access import IsInstructor,IsLmsAdmin,IsLearner,IsPlatformAdmin
 
 
 class ListCoursesViewsets(viewsets.ModelViewSet):
@@ -32,7 +33,21 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
         "description",
     ]
     ordering_fields = ["categories","title","description"]
+
+    def list(self, request, *args, **kwargs):
+        """Lists all courses on the LMS platform"""
+        return super().list(request,*args,kwargs)
+
+    def create(self,request,*args,**kwargs):
+        """Create new course"""
+        return super().create(request,*args,**kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
     def get_queryset(self):
+        """gets courses by ID"""
         course: Course = self.request.course
         if course.IsAuthenticated:
             return super().get_queryset().all()
@@ -41,11 +56,11 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
     def get_permissions(self):
         permission_class = self.permission_classes
         if self.action in ["list", "retrieve"]:
-            permission_class = [AllowAny]
+            permission_class = [AllowAny, IsLearner]
+        elif self.action in["create","partial_update","update"]:
+            permission_class = [IsInstructor,IsLmsAdmin,IsPlatformAdmin]
         elif self.action in ["destroy"]:
-            permission_class = [IsAuthenticated]
-        ##create custom permission(how verify a user admin etc.)
-        ##override get serializer class
+            permission_class = [IsLmsAdmin,IsPlatformAdmin]
         return [permission() for permission in permission_class]
 
 
