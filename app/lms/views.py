@@ -49,6 +49,22 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
     # You override the get_queryset when you want to filter down data
     # based on the requirements. Regardless of authentication or not,
     # we want to show all courses to all users.
+
+    # Work to be completed
+    """
+    3 List all modules in a course    --courses/{course_id}/modules
+    4 Given a module, return its lessons --- modules/{module_id}/lessons
+    5 Given a lesson, return its content --- lessons/{lesson_id}
+
+    How to ?
+
+    3. add a new api using custom action in drf to list all modules in a course.
+    the endpoint would neeed to be part of this class
+
+    4. Create a new class called ModuleViewSet, 
+        create a new detail endpoint using action as done above to retrieve all lessons in a module
+        remember to link a url with it. Repeat this same process for number 5. which is lesson.
+    """
     def get_queryset(self):
         """gets courses by ID"""
         course: Course = self.request.course
