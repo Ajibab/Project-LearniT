@@ -45,13 +45,17 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
-
+    # For now, i think you should remove this get_queryset overriding
+    # You override the get_queryset when you want to filter down data
+    # based on the requirements. Regardless of authentication or not,
+    # we want to show all courses to all users.
     def get_queryset(self):
         """gets courses by ID"""
         course: Course = self.request.course
         if course.IsAuthenticated:
             return super().get_queryset().all()
         return super().get_queryset().filter(id=course.id)
+    
 
     def get_permissions(self):
         permission_class = self.permission_classes
