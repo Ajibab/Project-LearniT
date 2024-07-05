@@ -7,6 +7,7 @@ app_name = "lms"
 
 router = DefaultRouter()
 router.register("courses", ListCoursesViewsets,basename="listofcourses")
+router.register("modules", ListCoursesViewsets, basename="listofmodules")
 
 
 urlpatterns = [

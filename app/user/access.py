@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from .models import User
 
 class IsLmsAdmin(permissions.BasePermission):
     """Allows access to only the admins of the
@@ -23,6 +24,8 @@ class IsInstructor(permissions.BasePermission):
     message = "Only instructors are authorized to perform this action."
 
     def has_permission(self, request, view):
+        from rest_framework.request import Request
+        request: Request
         return bool(request.user.is_authenticated and "TEACHER" in request.user.roles)
     
 class IsPlatformAdmin(permissions.BasePermission):
