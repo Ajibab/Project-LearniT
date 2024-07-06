@@ -83,7 +83,7 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods= ["GET"],
-        permission_classes=AllowAny,
+        permission_classes=[AllowAny],
         serializer_class=ModuleSerializer,
         url_path= "modules",
     )
