@@ -6,7 +6,6 @@ from core.models import AuditableModel
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.crypto import get_random_string
 from datetime import datetime, timezone
-from core.models import AuditableModel
 
 """Define the choice field for course duration in days"""
 DurationTypeChoice = (
@@ -17,7 +16,7 @@ DurationTypeChoice = (
 )
 
 ##--- Define Tables ---##
-class Categories(models.Model):
+class Categories(AuditableModel):
     """ This entity would section the courses into their various categories"""
     icon = models.ImageField(upload_to='Media/author',null=True,blank=True)
     name = models.CharField(max_length=200,null=True,blank=True)
@@ -30,14 +29,14 @@ class Categories(models.Model):
     
 
     
-class Language(models.Model):
+class Language(AuditableModel):
     """A table for the choice of language"""
     language = models.CharField(max_length=100)
 
     def __str__(self) -> str:
         return self.language
 
-class Course(models.Model):
+class Course(AuditableModel):
     """The course entity has module and lessons under it"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     title = models.CharField(max_length=500)
@@ -54,17 +53,17 @@ class Course(models.Model):
     @property
     def user_activity_count(self):
         """counts active user on the platform"""
-        return self.user_activity.counts()
+        return self.user_activity_count.count()
     
     @property
     def total_modules(self):
         """counts the total modules"""
-        return self.modules.count()
+        return self.total_modules.count()
     
     @property
     def total_instructors(self):
         """counts the total instructors"""
-        return self.instructor_profile.count()
+        return self.total_instructors.count()
     
     
     def __str__(self) -> str:
@@ -87,9 +86,13 @@ def pre_save_post_receiver(sender,instance,*args, **kwargs):
 
 pre_save.connect(pre_save_post_receiver, Course)
 
-class Module(models.Model):
+class Module(AuditableModel):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+
+    @property
+    def total_lessons(self):
+        return self.total_lessons.count()
     
     def __str__(self) -> str:
         return self.name
@@ -99,18 +102,17 @@ class ModuleTasksSubmission(AuditableModel):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE,related_name='module_assignment_for_user')
     assignment_upload = models.FileField(upload_to='upload_file/',blank=True,null=True)
 
+    
+
     def __str__(self) -> str:
         return f'{self.user} {self.module}'
     
-class Lesson(models.Model):
+class Lesson(AuditableModel):
     name = models.CharField(max_length=200)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
     content = models.TextField(max_length=300,null=True)  ## Rich text editor
     
-    def __str__(self) -> str:
-        return self.name
-    
-class UserCourseActivityTracker(models.Model):
+class UserCourseActivityTracker(AuditableModel):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now=True)
     end_date = models.DateTimeField(auto_now=True)  
@@ -119,7 +121,7 @@ class UserCourseActivityTracker(models.Model):
     def __str__(self) -> str:
         return self.user
     
-class UserCertificate(models.Model):
+class UserCertificate(AuditableModel):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     certificate = models.FileField(max_length = 100, null=True)

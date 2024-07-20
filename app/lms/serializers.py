@@ -84,10 +84,14 @@ class ModuleTaskSubmissionSerializers(serializers.ModelSerializer):
             if not is_admin(user) and user not in self.instance.is_user_course_activity():
                 raise serializers.ValidationError({"course":"Only authenticated users can submit a task"})
             return super().validate(attrs)
-
-
         
+class LessonsSerializer(serializers.ModelSerializer):
+    """Allows Instructors and Admins to update lessons"""
+    class Meta:
+        model = Lesson
+        fields = ['module','content','name']
 
-
-
-        
+        extra_kwargs = {
+            'name': {'write_only': True},
+            'content': {'write_only': True}
+        }

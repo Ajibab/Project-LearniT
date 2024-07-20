@@ -1,4 +1,5 @@
 from typing import List
+from core.utilities.validators import is_admin, is_course_instructor,is_user_course_activity
 from django.shortcuts import render
 from django.db.models import Exists, Q
 from django.contrib.auth import get_user_model
@@ -13,8 +14,8 @@ from rest_framework import filters, status, viewsets, serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Course, Categories, Module
-from .serializers import (ListCoursesSerializer,ModuleSerializer,
+from .models import Course, Categories, Module, Lesson
+from .serializers import (ListCoursesSerializer,ModuleSerializer,LessonsSerializer,
                           CourseUpgradeSerializer,DevelopModuleSerializer)
 from user.access import IsInstructor,IsLmsAdmin,IsLearner,IsPlatformAdmin
 
@@ -87,21 +88,79 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
         serializer_class=ModuleSerializer,
         url_path= "modules",
     )
-    def get_module_given_a_course(self,request,*args,**kwargs):
+    def get_modules_given_a_course(self,request,*args,**kwargs):
         """This will return all modules given a course"""
-        user=self.request.user
+        #user=self.request.user
         course_instance: Course=self.get_object()
-        modules: List [Module] = course_instance.modules
-        ## after getting the module, pass it through serializer
-        active_learner = course_instance.user_activity_count.all()
-        is_active_learner = active_learner.filter(user=user).exists()
-        serializer_class_ = ModuleSerializer if IsLmsAdmin(
-            user) or is_active_learner or user in course_instance.instructor_profile.all() else None
+        modules: List [Module] = course_instance.total_modules
+        serializer_class_ = ModuleSerializer
         data = serializer_class_(
             instance=modules, context={"request": request}, many=True
         ).data
 
         return Response( {"success": True, "data": data}, status.HTTP_200_OK)
+    
+class ModuleViewSet(viewsets.ModelViewSet):
+    """This viewset entails the endpoints needed to retrieve a lesson given a module."""
+    queryset = Module.objects.all()
+    serializer_class = ModuleSerializer
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["get", "post", "patch", "delete"]
 
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
 
+    search_fields = [
+        "names",
+        "modules",
+        "content",
+    ]
+    ordering_fields = ["names","modules","content"]
+
+    def list(self, request, *args, **kwargs):
+        """Lists all lessons on the LMS platform"""
+        return super().list(request,*args,kwargs)
+
+    def create(self,request,*args,**kwargs):
+        """Create new lessons"""
+        return super().create(request,*args,**kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def get_permissions(self):
+        permission_classes = self.permission_classes
+        if self.action in ["list", "retrieve"]:
+            permission_classes = [IsLearner]
+        elif self.action in["create","partial_update","update"]:
+            permission_classes = [IsInstructor | IsLmsAdmin | IsPlatformAdmin]
+        elif self.action in ["destroy"]:
+            permission_classes = [IsLmsAdmin | IsPlatformAdmin]
+        return [permission() for permission in permission_classes]
+    
+    """ Create a custom action API to retrieve Lessons given a Module"""
+    @action(
+        detail=True,
+        methods= ["GET"],
+        permission_classes=[AllowAny],
+        serializer_class=LessonsSerializer,
+        url_path= "lessons",
+    )
+    def get_lessons_given_a_module(self,request,*args,**kwargs):
+        """This will return all Lessons given a Module"""
+        module_instance: Module=self.get_object()
+        lessons: List [Lesson] = module_instance.total_lessons
+        serializer_class_ = LessonsSerializer
+        data = serializer_class_(
+            instance=lessons, context={"request": request}, many=True
+        ).data
+
+        return Response( {"success": True, "data": data}, status.HTTP_200_OK)
+    
+class ContentViewsets(viewsets.ModelViewSet):
+    """This endpoint retrieves content given the lesson"""
+    
 
