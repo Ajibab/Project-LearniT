@@ -11,3 +11,6 @@ python-decouple==3.6
 twilio==8.1.0
 pyotp==2.9.0
 flower==1.1.0
+psycopg2-binary==2.9.3
+Pillow==10.3.0
+django-taggit

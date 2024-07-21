@@ -6,16 +6,10 @@ from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework import serializers
 
-"""I am unable to set-up an email service using 
-SendGrid and Twilio. The platform seems t require
-extra security check"""
-
 
 def is_valid_email(email):
-    ##--The regular expression pattern for email validation--##
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 
-    ##--match the email pattern with regular expression--##
     match = re.match(pattern, email)
     if match:
         return True

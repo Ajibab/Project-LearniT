@@ -5,8 +5,10 @@ TOKEN_TYPE = (
 )
 
 ROLE_CHOICE=(
-    ("ADMIN","ADMIN"),
-    ("CUSTOMER","CUSTOMER"),
+    ("INSTRUCTOR","INSTRUCTOR"),
+    ("LEARNER","LEARNER"),
+    ("LMS_ADMIN","LMS_ADMIN"),
+    ("PLATFORM_ADMIN","PLATFORM_ADMIN"),
 )
 
 @dataclass
@@ -17,3 +19,5 @@ class TokenEnum:
 class SytemRoleEnum:
     ADMIN = "ADMIN"
     CUSTOMER = "CUSTOMER"
+
+GENDER_OPTION = (("MALE", "MALE"), ("FEMALE","FEMALE"))

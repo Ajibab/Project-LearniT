@@ -72,22 +72,10 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password_1 = serializers.CharField(
         max_length=120, write_only=True, required=True, min_length=6
     )
-    #new_password_2 = serializers.CharField(
-        #max_length=120, write_only=True, required=True, min_length=6
-    #)
     old_password = serializers.CharField(
         max_length=120, write_only=True, required=True, min_length=6
     )
 
-    #class Meta:
-        #model = User
-        #fields = ("new_password_1", "new_password_2", "old_password")
-
-    #def validate_new_password_1(self, attrs):
-        #if attrs["new_password_1"] != attrs["new_password_2"]:
-            #raise serializers.ValidationError({"password": "mismatch password"})
-
-        #return attrs
 
     def validate_old_password(self, value):
         user_request = self.context["request"].user
