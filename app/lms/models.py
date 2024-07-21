@@ -110,7 +110,10 @@ class ModuleTasksSubmission(AuditableModel):
 class Lesson(AuditableModel):
     name = models.CharField(max_length=200)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    content = models.TextField(max_length=300,null=True)  ## Rich text editor
+    content = models.TextField(max_length=300,null=True)
+
+    def __str__(self) -> str:
+        return self.name
     
 class UserCourseActivityTracker(AuditableModel):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE)

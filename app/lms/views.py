@@ -50,10 +50,7 @@ class ListCoursesViewsets(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
-    # For now, i think you should remove this get_queryset overriding
-    # You override the get_queryset when you want to filter down data
-    # based on the requirements. Regardless of authentication or not,
-    # we want to show all courses to all users.
+
 
     # Work to be completed
     """
@@ -161,6 +158,59 @@ class ModuleViewSet(viewsets.ModelViewSet):
         return Response( {"success": True, "data": data}, status.HTTP_200_OK)
     
 class ContentViewsets(viewsets.ModelViewSet):
-    """This endpoint retrieves content given the lesson"""
+    """This endpoint retrieves content given a lesson"""
+    queryset = Lesson.objects.all()
+    serializer_class = Lesson
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    search_fields = [
+        "names",
+        "modules",
+    ]
+    ordering_fields = ["names","modules"]
+
+    def create(self,request,*args,**kwargs):
+        """Create new contents"""
+        return super().create(request,*args,**kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def get_permissions(self):
+        permission_classes = self.permission_classes
+        if self.action in ["retrieve"]:
+            permission_classes = [IsLearner]
+        elif self.action in["create","partial_update","update"]:
+            permission_classes = [IsInstructor | IsLmsAdmin | IsPlatformAdmin]
+        elif self.action in ["destroy"]:
+            permission_classes = [IsLmsAdmin | IsPlatformAdmin]
+        return [permission() for permission in permission_classes]
+    
+    """ Create a custom action API to retrieve Contents given a Lesson"""
+    @action(
+        detail=True,
+        methods= ["GET"],
+        permission_classes=[AllowAny],
+        serializer_class=LessonsSerializer,
+        url_path= "contents",
+    )
+    def get_contents_given_a_lesson(self,request,*args,**kwargs):
+        """This will return all Contents given a Lesson"""
+        lesson_instance: Lesson=self.get_object()
+        lessons: List [Lesson] = lesson_instance.content
+        serializer_class_ = LessonsSerializer
+        data = serializer_class_(
+            instance=lessons, context={"request": request}, many=True
+        ).data
+
+        return Response( {"success": True, "data": data}, status.HTTP_200_OK)
+    
     
 
