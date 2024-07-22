@@ -117,9 +117,9 @@ class Lesson(AuditableModel):
     
 class UserCourseActivityTracker(AuditableModel):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE)
-    start_date = models.DateTimeField(auto_now=True)
-    end_date = models.DateTimeField(auto_now=True)  
-    course = models.ForeignKey(Course,on_delete=models.CASCADE)  
+    course = models.ForeignKey(Course,on_delete=models.CASCADE) 
+    module = models.ForeignKey(Module,on_delete=models.CASCAD )
+    user_activity_time = models.IntegerField() 
 
     def __str__(self) -> str:
         return self.user

@@ -1,10 +1,7 @@
-import uuid
-from .models import Course,UserCourseActivityTracker,Categories,Language,Module,ModuleTasksSubmission,Lesson,UserCertificate
+from .models import Course,UserCourseActivityTracker,Categories,Module,ModuleTasksSubmission,Lesson
 from user.models import User
-from rest_framework import exceptions, serializers
-from django.db import models
-from core.utilities.validators import is_admin,is_course_instructor,is_user_course_activity
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
+from core.utilities.validators import is_admin,is_course_instructor
 
 
 ##-- Create the List Course Serializers --##
