@@ -7,8 +7,8 @@ app_name = "lms"
 
 router = DefaultRouter()
 router.register("courses", ListCoursesViewsets,basename="listofcourses")
-router.register("modules", ListCoursesViewsets, basename="listofmodules")
-router.register("lessons", ModuleViewSet,basename="listoflessons")
+router.register("module", ListCoursesViewsets, basename="listofmodules")
+router.register("module", ModuleViewSet,basename="listoflessons")
 router.register("contents",ContentViewsets,basename="contentoflesson")
 
 
