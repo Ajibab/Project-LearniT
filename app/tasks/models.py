@@ -16,11 +16,10 @@ from django.utils.translation import gettext_lazy as _
 
 class Quiz(AuditableModel):
     module = models.OneToOneField("lms.Module",related_name="module_task",on_delete=models.CASCADE,blank=True,null=True)
-    task = models.CharField(max_length=255)
+    description = models.TextField(blank=True,null=True)
     creator = models.ForeignKey("user.User",related_name='created_tasks',on_delete=models.CASCADE)
     reattempt = models.BooleanField(default=True,verbose_name='Reattempt Question')
     slug = models.SlugField(null=True, blank=True)
-
 
     class Meta:
         verbose_name = "Tasks"
@@ -34,21 +33,17 @@ class Quiz(AuditableModel):
     def __str__(self) -> str:
         return (self.task)
     
-    #@property
-    #def all_tags(self):
-        #"""contains all the tags of this task"""
-        #return [i.name for i in self.tags.all()]
     
     @property
     def attempters(self):
         """The number of users that attempted the task"""
-        return self.task_score.count()
+        return self.task_count()
     
     
     @property
     def question_count(self):
         """Number of questions in the task"""
-        return self.task_question.count()
+        return self.task_count()
     
     def task_attempters(self):
         return self.task_score.all()
